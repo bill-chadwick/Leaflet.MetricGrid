@@ -20,12 +20,13 @@ L.MetricGrid = L.Layer.extend({
         proj4ProjDef: "must be provided",                    // must be provided
         bounds: [[0, 0] , [0, 0]],                           // must be provided. First coord is botton left, second is top right in [x,y] format
         clip: null,                                          // optional
+        drawClip: false,                                     // optional, when try, the clip bounds are drawn with the same pen as the grid
         hundredKmSquareFunc: function(e, n) {return "";},    // optional, params are eastings and northings in metres
 
-        showAxisLabels: true,
-        showSquareLabels: false,
-        opacity: 0.9,
-        weight: 1,
+        showAxisLabels: [100, 1000, 10000],                  // show axis for listed grid spacings - omit 100000
+        showSquareLabels: [],                                // show square labels for listed grid spacings
+        opacity: 0.7,
+        weight: 2,                                           // use 2 for best results, else label rub-out is less good (antialiased pixels)
         color: "#00f",
         font: "bold 16px Verdana",
         minInterval: 100,                // minimum grid interval in metres
@@ -187,8 +188,10 @@ L.MetricGrid = L.Layer.extend({
             }
 
             // finish the path and set the clip region
-            ctx.stroke();
-            ctx.clip();
+            if (this.options.drawClip) {
+                ctx.stroke();                
+            }
+            ctx.clip();         
         }
     },
 
@@ -212,7 +215,7 @@ L.MetricGrid = L.Layer.extend({
         canvas.style.width  = size.x + "px";
         canvas.style.height = size.y + "px";
 
-        this._draw(true);
+        this._draw();
     },
 
 
@@ -451,7 +454,7 @@ L.MetricGrid = L.Layer.extend({
     // Then we draw vertical and horizontal grid lines for that box.
     // Then we optionally label the left and right axis, taking care to avoid colliding labels.
     // Then we optionally label each grid square in its bottom left corner.
-    _draw: function(label) {
+    _draw: function() {
 
         var canvas = this._canvas;
         var map = this._map;
@@ -597,10 +600,10 @@ L.MetricGrid = L.Layer.extend({
             // like the OS do on their printed maps. This means the labels never collide.
             
             ctx.fillStyle=this.options.color; // for rub out
-            var rubWidth = this.options.weight * 2;
+            var rubWidth = this.options.weight * 3;
             
             // Eastings axis labels
-            if (this.options.showAxisLabels && label && (d < 100000)) {
+            if (this.options.showAxisLabels.indexOf(d) >= 0) {
                 for (x = grdWx; x <= grdEx; x += d) {
                     for (y = grdSy; y <= grdNy; y += d) {
 
@@ -625,7 +628,7 @@ L.MetricGrid = L.Layer.extend({
             }
 
             // Northings axis labels
-            if (this.options.showAxisLabels && label && (d < 100000)) {
+            if (this.options.showAxisLabels.indexOf(d) >= 0) {
                 for (y = grdSy; y <= grdNy; y += d) {
                     for (x = grdWx; x <= grdEx; x += d) {
 
@@ -651,7 +654,7 @@ L.MetricGrid = L.Layer.extend({
 
             // Grid Square labels in bottom left of each square, with a 2px padding
             var str;
-            if (this.options.showSquareLabels && label) {
+            if (this.options.showSquareLabels.indexOf(d) >= 0) {
                 for (y = grdSy; y <= grdNy; y += d) {
                     for (x = grdWx; x <= grdEx; x += d) {
 

@@ -34,12 +34,14 @@
 	var bingLayer = L.tileLayer.bing(BING_KEY);
 	
 	var bGrid = L.britishGrid({
-        color: '#00f'
+        color: '#00f',
+        showSquareLabels: [100000], // label 100km grid squares
+        drawClip: true
     });
 	
 	var iGrid = L.irishGrid({
 		color: '#080',
-		showSquareLabels: true
+		showSquareLabels: [100, 10000, 100000] // label grid squares except 1km squares
 	});
 	
 	var mymap = L.map('mapid', {
