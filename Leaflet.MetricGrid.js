@@ -585,7 +585,6 @@ L.MetricGrid = L.Layer.extend({
 
                 ctx.beginPath();
                 ctx.moveTo(pts[0].x, pts[0].y);
-                var drawnText = false;
                 for (i = 1; i < pts.length; i++) {
                     ctx.lineTo(pts[i].x, pts[i].y);
                 }
@@ -596,7 +595,10 @@ L.MetricGrid = L.Layer.extend({
             // We label the West and South axis at grid croosings that are on screen.
             // We label in the middle of the vertical or horizontal edge of a grid square,
             // like the OS do on their printed maps. This means the labels never collide.
-
+			
+			ctx.fillStyle=this.options.color; // for rub out
+			var rubWidth = this.options.weight * 2;
+			
             // Eastings axis labels
             if (this.options.showAxisLabels && label && (d < 100000)) {
                 for (x = grdWx; x <= grdEx; x += d) {
@@ -609,6 +611,12 @@ L.MetricGrid = L.Layer.extend({
                         if ((s.x > 0) && (s.y < hh) && (x < this.options.bounds[1][0])) {
                             var eStr = this._format_eastings(x, d);
                             txtWidth = ctx.measureText(eStr).width;
+							
+							// rub out the bit of the grid line the text will be over
+							ctx.globalCompositeOperation = "destination-out";
+							ctx.fillRect(s.x - (rubWidth/2), s.y-txtHeight, rubWidth, txtHeight * 1.2);
+							ctx.globalCompositeOperation = "source-over";
+							
                             ctx.fillText(eStr, s.x - (txtWidth / 2), s.y);
                             break;
                         }
@@ -627,6 +635,13 @@ L.MetricGrid = L.Layer.extend({
                         // check on screen and within grid bounds
                         if ((s.x > 0) && (s.y < hh) && (y < this.options.bounds[1][1])) {
                             var nStr = this._format_northings(y, d);
+							txtWidth = ctx.measureText(eStr).width;
+							
+							// rub out the bit of the grid line the text will be over
+							ctx.globalCompositeOperation = "destination-out";
+							ctx.fillRect(s.x - txtWidth * 0.1, s.y - (rubWidth/2), txtWidth * 1.2, rubWidth);
+							ctx.globalCompositeOperation = "source-over";
+														
                             ctx.fillText(nStr, s.x, s.y + (txtHeight / 2));
                             break;
                         }
