@@ -650,6 +650,7 @@ L.MetricGrid = L.Layer.extend({
             }
 
             // Grid Square labels in bottom left of each square, with a 2px padding
+            var str;
             if (this.options.showSquareLabels && label) {
                 for (y = grdSy; y <= grdNy; y += d) {
                     for (x = grdWx; x <= grdEx; x += d) {
@@ -662,8 +663,9 @@ L.MetricGrid = L.Layer.extend({
                             var nStr = this._format_northings(x, d);
                             var eStr = this._format_northings(y, d);
                             var sq = this.options.hundredKmSquareFunc(x, y);
+                            str = sq;
                             if (d < 100000) {
-                                str = sq + eStr + nStr;
+                                str += eStr + nStr;
                             }
                             ctx.fillText(str, s.x + 2, s.y - 2);
                         }
