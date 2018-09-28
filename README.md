@@ -15,6 +15,8 @@ Grid lines gnerally project as curves on Web Mercator at low zooms, but will ten
 
 This code depends on proj4.js 2.5.0 or later
 
+Development sponsored by Geograph Britain and Ireland - http://www.geograph.org.uk/mapper/photomap.php
+
 Bill Chadwick
 
 
