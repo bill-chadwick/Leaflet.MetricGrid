@@ -18,9 +18,9 @@ L.MetricGrid = L.Layer.extend({
     options: {
 
         proj4ProjDef: "must be provided",                    // must be provided
-        bounds: [[0, 0] , [0, 0]],                           // must be provided. First coord is botton left, second is top right in [x,y] format
+        bounds: [[0, 0] , [0, 0]],                           // must be provided. First coord is bottom left, second is top right in [x,y] format
         clip: null,                                          // optional
-        drawClip: false,                                     // optional, when try, the clip bounds are drawn with the same pen as the grid
+        drawClip: false,                                     // optional, when true, the clip bounds are drawn with the same pen as the grid
         hundredKmSquareFunc: function(e, n) {return "";},    // optional, params are eastings and northings in metres
 
         showAxisLabels: [100, 1000, 10000],                  // show axis for listed grid spacings - omit 100000
@@ -318,33 +318,6 @@ L.MetricGrid = L.Layer.extend({
         return spacing;
     },
 
-
-    // Cartesian squared distance between two points
-    _squaredDistance: function (x1, y1, x2, y2) {
-            var dx = x2 - x1;
-            var dy = y2 - y1;
-            return dx * dx + dy * dy;
-    },
-
-
-    // Returns square of distance of point x,y from line between x1,y1 and x2,y2
-    _squaredSegmentDistance: function (x, y, x1, y1, x2, y2) {
-      var dx = x2 - x1;
-      var dy = y2 - y1;
-      if (dx !== 0 || dy !== 0) {
-        var t = ((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy);
-        if (t > 1) {
-          x1 = x2;
-          y1 = y2;
-        } else if (t > 0) {
-          x1 += dx * t;
-          y1 += dy * t;
-        }
-      }
-      return this._squaredDistance(x, y, x1, y1);
-    },
-
-
     // Finds the set of screen points corresponding to a grid line.
     // Most metric grid lines are nearly straight on a Web Mercator map, especially when zoomed in.
     // We use the minimum number of line segments that represent the actual grid line,
@@ -404,7 +377,8 @@ L.MetricGrid = L.Layer.extend({
             geoM = interpolate(fracM);
             m = map.latLngToContainerPoint(L.latLng(geoM[1], geoM[0]));
 
-            if (this._squaredSegmentDistance(m.x, m.y, a.x, a.y, b.x, b.y) < squaredTolerance) {
+            if (L.LineUtil.pointToSegmentDistance(m, a, b) < squaredTolerance){
+            //if (this._squaredSegmentDistance(m.x, m.y, a.x, a.y, b.x, b.y) < squaredTolerance) {
               // If the m point is sufficiently close to the straight line, then we
               // discard it.  Just use the b coordinate and move on to the next line
               // segment.
@@ -579,7 +553,7 @@ L.MetricGrid = L.Layer.extend({
             var w = grdEx - grdWx;
             for (y = grdSy; y <= grdNy; y += d) {
 
-                // interpolate northings from right to left
+                // interpolate eastings from right to left
                 function _interpolateX (frac) {
                     return proj4(proj).inverse([grdEx - (frac * w), y]);
                 }
