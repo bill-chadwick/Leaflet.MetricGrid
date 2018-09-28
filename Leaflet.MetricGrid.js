@@ -333,7 +333,7 @@ L.MetricGrid = L.Layer.extend({
     //
     // This code is adapted from OpenLayers 3
     //
-    _getPoints: function (interpolate, squaredTolerance, map) {
+    _getPoints: function (interpolate, tolerance, map) {
 
         var geoA = interpolate(0);
         var geoB = interpolate(1);
@@ -377,8 +377,7 @@ L.MetricGrid = L.Layer.extend({
             geoM = interpolate(fracM);
             m = map.latLngToContainerPoint(L.latLng(geoM[1], geoM[0]));
 
-            if (L.LineUtil.pointToSegmentDistance(m, a, b) < squaredTolerance){
-            //if (this._squaredSegmentDistance(m.x, m.y, a.x, a.y, b.x, b.y) < squaredTolerance) {
+            if (L.LineUtil.pointToSegmentDistance(m, a, b) < tolerance){
               // If the m point is sufficiently close to the straight line, then we
               // discard it.  Just use the b coordinate and move on to the next line
               // segment.
