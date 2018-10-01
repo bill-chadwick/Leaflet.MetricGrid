@@ -263,7 +263,7 @@ L.MetricGrid = L.Layer.extend({
         if (this.options.showAxis100km) {
             var hs = h.toString();
             var i;
-            for(i = 0; i < hs.length; i++) {
+            for(i = (hs.length-1); i >= 0; i--) {
                 r = String.fromCharCode(hs.charCodeAt(i) + 8272) + r; 
             }
         }
@@ -625,7 +625,7 @@ L.MetricGrid = L.Layer.extend({
                         // check on screen and within grid bounds
                         if ((s.x > 0) && (s.y < hh) && (y < this.options.bounds[1][1])) {
                             var nStr = this._format_northings(y, d);
-                            txtWidth = ctx.measureText(eStr).width;
+                            txtWidth = ctx.measureText(nStr).width;
                             
                             // rub out the bit of the grid line the text will be over
                             ctx.globalCompositeOperation = "destination-out";
