@@ -24,6 +24,7 @@ L.MetricGrid = L.Layer.extend({
         hundredKmSquareFunc: function(e, n) {return "";},    // optional, params are eastings and northings in metres
 
         showAxisLabels: [100, 1000, 10000],                  // show axis for listed grid spacings - omit 100000
+        showAxis100km: false,
         showSquareLabels: [],                                // show square labels for listed grid spacings
         opacity: 0.7,
         weight: 2,                                           // use 2 for best results, else label rub-out is less good (antialiased pixels)
@@ -190,8 +191,11 @@ L.MetricGrid = L.Layer.extend({
             // finish the path and set the clip region
             if (this.options.drawClip) {
                 ctx.stroke();                
-            }
-            ctx.clip();         
+                }
+            ctx.clip();   
+
+
+            
         }
     },
 
@@ -239,6 +243,7 @@ L.MetricGrid = L.Layer.extend({
     _formatEastOrNorth(n, spacing) {
 
         var r;
+        var h = Math.floor(n / 100000);
         n = n % 100000; // metres within 100km square
 
         if (spacing < 1000) {
@@ -252,6 +257,15 @@ L.MetricGrid = L.Layer.extend({
         }
         else {
             r = Math.floor(n / 10000).toString();
+        }
+        
+        // prepend hundreds of km in subscript
+        if (this.options.showAxis100km) {
+            var hs = h.toString();
+            var i;
+            for(i = 0; i < hs.length; i++) {
+                r = String.fromCharCode(hs.charCodeAt(i) + 8272) + r; 
+            }
         }
 
         return r;
@@ -734,3 +748,7 @@ L.IrishGrid = L.MetricGrid.extend({
 L.irishGrid = function (options) {
     return new L.IrishGrid(options);
 };
+
+
+
+
