@@ -472,7 +472,7 @@ L.MetricGrid = L.Layer.extend({
                 }
             }
 
-            // get bounds in grid projection
+            // get bounds of map corners in grid projection
             var mapB = map.getBounds();
             var mapSW = mapB.getSouthWest();
             var mapNE = mapB.getNorthEast();
@@ -482,13 +482,25 @@ L.MetricGrid = L.Layer.extend({
             var mapNEg = proj4(proj).forward([mapNE.lng, mapNE.lat]);
             var mapNWg = proj4(proj).forward([mapNW.lng, mapNW.lat]);
             var mapSEg = proj4(proj).forward([mapSE.lng, mapSE.lat]);
+            
+            //also the middles of the sides of the map            
+            var mapSMg = proj4(proj).forward([mapB.getCenter().lng, mapB.getSouth()]);
+            var mapNMg = proj4(proj).forward([mapB.getCenter().lng, mapB.getNorth()]);
+            var mapWMg = proj4(proj).forward([mapB.getWest(), mapB.getCenter().lat]);
+            var mapEMg = proj4(proj).forward([mapB.getEast(), mapB.getCenter().lat,]);
 
-            // extend grid bounds to enclose the map
+            // extend grid bounds to enclose the map corners           
             var grdWx = Math.min(mapSWg[0], mapNWg[0]);
             var grdEx = Math.max(mapSEg[0], mapNEg[0]);
             var grdSy = Math.min(mapSWg[1], mapSEg[1]);
             var grdNy = Math.max(mapNWg[1], mapNEg[1]);
 
+            // extend grid bounds to enclose the middles of the sides
+            grdWx = Math.min(mapWMg[0], grdWx);
+            grdEx = Math.max(mapEMg[0], grdEx);
+            grdSy = Math.min(mapSMg[1], grdSy);
+            grdNy = Math.max(mapEMg[1], grdNy);
+            
             // round up/down based on the spacing
             grdWx = Math.floor(grdWx / spacing) * spacing;
             grdSy = Math.floor(grdSy / spacing) * spacing;
@@ -599,6 +611,12 @@ L.MetricGrid = L.Layer.extend({
 
                         // check on screen and within grid bounds
                         if ((s.x > 0) && (s.y < hh) && (x < this.options.bounds[1][0])) {
+                            
+                            if(this.options.clip) {
+                                if (!this._inside([x, y+d2], this.options.clip)) {
+                                    continue;
+                                }
+                            }
                             var eStr = this._format_eastings(x, d);
                             txtWidth = ctx.measureText(eStr).width;
                             
@@ -624,6 +642,13 @@ L.MetricGrid = L.Layer.extend({
 
                         // check on screen and within grid bounds
                         if ((s.x > 0) && (s.y < hh) && (y < this.options.bounds[1][1])) {
+                            
+                            if(this.options.clip) {
+                                if (!this._inside([x+d2, y], this.options.clip)) {
+                                    continue;
+                                }
+                            }
+                            
                             var nStr = this._format_northings(y, d);
                             txtWidth = ctx.measureText(nStr).width;
                             
@@ -711,13 +736,13 @@ L.britishGrid = function (options) {
     return new L.BritishGrid(options);
 };
 
-/** Definitions for a Irish Grid - EPSG code 29902
+/** Definitions for a Irish Grid - EPSG code 29903 (TM75)
 * Clip path avoids overlaying L.BritishGrid
 */
 L.IrishGrid = L.MetricGrid.extend({
 
     options: {
-        proj4ProjDef: "+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=1.000035 +x_0=200000 +y_0=250000 +a=6377340.189 +b=6356034.447938534 +units=m +no_defs",
+        proj4ProjDef: "+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=1.000035 +x_0=200000 +y_0=250000 +ellps=mod_airy +towgs84=482.5,-130.6,564.6,-1.042,-0.214,-0.631,8.15 +uni+units=m +no_defs",
         bounds: [[0, 0] , [500000, 500000]],
         clip: [
             [0, 0],
