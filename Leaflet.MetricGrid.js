@@ -30,8 +30,9 @@ L.MetricGrid = L.Layer.extend({
         weight: 2,                                           // use 2 for best results, else label rub-out is less good (antialiased pixels)
         color: "#00f",
         font: "bold 16px Verdana",
-        minInterval: 100,                // minimum grid interval in metres
-        maxInterval: 100000              // maximum grid interval in metres
+        minInterval: 100,                   // minimum grid interval in metres
+        maxInterval: 100000,                // maximum grid interval in metres
+        minZoom: 4                          // minimum zoom at which grid is drawn
     },
 
 
@@ -446,8 +447,8 @@ L.MetricGrid = L.Layer.extend({
         var canvas = this._canvas;
         var map = this._map;
 
-        if (L.Browser.canvas && map) {
-
+        if (L.Browser.canvas && map && ((map.getZoom() >= this.options.minZoom))) {
+        
             var spacing = this._calcInterval();
             var proj = this.options.proj4ProjDef
             var ctx = canvas.getContext("2d");
@@ -499,7 +500,7 @@ L.MetricGrid = L.Layer.extend({
             grdWx = Math.min(mapWMg[0], grdWx);
             grdEx = Math.max(mapEMg[0], grdEx);
             grdSy = Math.min(mapSMg[1], grdSy);
-            grdNy = Math.max(mapEMg[1], grdNy);
+            grdNy = Math.max(mapNMg[1], grdNy);
             
             // round up/down based on the spacing
             grdWx = Math.floor(grdWx / spacing) * spacing;
@@ -774,6 +775,30 @@ L.irishGrid = function (options) {
     return new L.IrishGrid(options);
 };
 
+/** Definitions for UTM grid
+*/
+L.UtmGrid = L.MetricGrid.extend({
 
+    options: {
+        bounds: [[100000, 0] , [900000, 9400000]],
+    },
+    
+    initialize: function(zone, bSouth, options) {
+        
+        options.proj4ProjDef = "+proj=utm +zone=" + zone + " +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
+        if (bSouth) {
+            options.proj4ProjDef += " +south";
+            options.bounds = [[100000, 600000] , [900000, 10000000]];
+        }
+        L.setOptions(this, options);
+    }
+    
+});
+            
+// instance factory
+// constructor params are UTM zone 1..60 and boolean true for southern hemisphere
+L.utmGrid = function (zone, bSouth, options) {
+    return new L.UtmGrid(zone, bSouth, options);
+};
 
 

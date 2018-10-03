@@ -1,179 +1,73 @@
 <!doctype html>
-
 <html>
-
 <head>
 
-    <meta charset="utf-8">
-
-    <title>Leaflet UTM Grid</title>
-
+<meta charset="utf-8">
+<title>Leaflet UTM Grid</title>
+<style type="text/css">
+    html, body, #map { width: 100%; height: 100%; margin: 0; background: #fff; }
+</style>
  
-
-                    <style type="text/css">
-
-        html, body, #map { width: 100%; height: 100%; margin: 0; background: #fff; }
-
-    </style>
-
- 
-
 <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.css" rel="stylesheet" type="text/css" />
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet-src.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js"></script>
-
 <script src="Leaflet.MetricGrid.js"></script>
-
  
-
 </head>
 
 <body>
-
-                <div id="mapid" style="left:10px; top:10px; width: 800px; height: 800px;"></div>
-
+    <div id="mapid" style="left:10px; top:10px; width: 800px; height: 800px;"></div>
  
-
     <script type="text/javascript">
-
                
 
-    /** Definitions for UTM Zone 30 north - EPSG code 32630
-
-    */
-
-    L.Utm30NGrid = L.MetricGrid.extend({
-
- 
-
-        options: {
-
-            proj4ProjDef: "+proj=utm +zone=30 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
-
-            bounds: [[0, 0] , [1000000, 10000000]]       
-
-        }
-
+               
+    var osmLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                    maxZoom: 18,
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    id: 'mapbox.streets'
+    });
+   
+    var u30Grid = L.utmGrid(30, false, {
+        color: '#C00',
+        showAxisLabels: [100, 1000, 10000, 100000],
+        showAxis100km: true
+    });
+   
+    var u31Grid = L.utmGrid(31, false, {
+        color: '#0C0',
+        showAxisLabels: [100, 1000, 10000, 100000],
+        showAxis100km: true
     });
 
-               
-
-                L.Utm31NGrid = L.MetricGrid.extend({
-
- 
-
-        options: {
-
-            proj4ProjDef: "+proj=utm +zone=31 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
-
-            bounds: [[0, 0] , [1000000, 10000000]]       
-
-        }
-
+    var u30sGrid = L.utmGrid(30, true, {
+        color: '#00C',
+        showAxisLabels: [100, 1000, 10000, 100000],
+        showAxis100km: true
     });
-
- 
-
-    // instance factory
-
-    L.utm30NGrid = function (options) {
-
-        return new L.Utm30NGrid(options);
-
+    
+    var mymap = L.map('mapid', {
+        center: [52, -1],
+        zoom: 14,
+        layers: [osmLayer, u30Grid, u31Grid, u30sGrid]
+    });
+   
+   
+    var baseMaps = {
+        "OSM": osmLayer
     };
 
-               
-
-                L.utm31NGrid = function (options) {
-
-        return new L.Utm31NGrid(options);
-
+    var overlayMaps = {
+        "UTM 30N Grid": u30Grid,
+        "UTM 31N Grid": u31Grid,
+        "UTM 30S Grid": u30sGrid
     };
-
+   
+    L.control.layers(baseMaps, overlayMaps).addTo(mymap);
  
-
-                var osmLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-
-                                maxZoom: 18,
-
-                                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-
-                                                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-
-                                                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-
-                                id: 'mapbox.streets'
-
-                });
-
                
-
-                var sGrid = L.utm30NGrid({
-
-                                color: '#C00',
-
-                                showAxisLabels: [100, 1000, 10000, 100000],
-
-        showAxis100km: true
-
-                });
-
-               
-
-                var uGrid = L.utm31NGrid({
-
-                                color: '#0C0',
-
-                                showAxisLabels: [100, 1000, 10000, 100000],
-
-        showAxis100km: true
-
-                });
-
-               
-
-                var mymap = L.map('mapid', {
-
-                                center: [52, -1],
-
-                                zoom: 14,
-
-                                layers: [osmLayer, sGrid, uGrid]
-
-                });
-
-               
-
-               
-
-                var baseMaps = {
-
-                                "OSM": osmLayer
-
-                };
-
- 
-
-                var overlayMaps = {
-
-        "UTM 30N Grid": sGrid,
-
-                                "UTM 31N Grid": uGrid
-
-                };
-
-               
-
-                L.control.layers(baseMaps, overlayMaps).addTo(mymap);
-
- 
-
-               
-
     </script>
-
 </body>
-
 </html>
