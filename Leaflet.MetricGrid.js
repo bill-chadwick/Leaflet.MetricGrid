@@ -777,10 +777,11 @@ L.irishGrid = function (options) {
 
 /** Definitions for UTM grid
 */
+
 L.UtmGrid = L.MetricGrid.extend({
 
     options: {
-        bounds: [[100000, 0] , [900000, 9400000]],
+        bounds: [[100000, 0] , [900000, 9400000]]
     },
     
     initialize: function(zone, bSouth, options) {
@@ -790,6 +791,54 @@ L.UtmGrid = L.MetricGrid.extend({
             options.proj4ProjDef += " +south";
             options.bounds = [[100000, 600000] , [900000, 10000000]];
         }
+
+        options.hundredKmSquareFunc = function(e, n) {
+            
+            var r = "";
+            
+            // 100kM square UTM Easting letters, standard treatment (NIMA 8358.1 Appx B3)
+
+            var UTMEast = [
+            "ABCDEFGH", // zones 1,4, ...,   -400, -300, -200, -100, 0, 100, 200, 300 kM
+            "JKLMNPQR", // zones 2,5, ...,
+            "STUVWXYZ"  // zones 3,6, ...,
+            ];
+
+            // 100kM square UTM Northing letters, standard treatment (NIMA 8358.1 Appx B3)
+            // repeat every 2000 kM
+            // start at A at 0 Lat and go forwards for northern hemisphere
+            // start at V at 0 Lat and go backwards for southern hemisphere
+
+            var UTMNorthGroup1 =
+            [
+            "ABCDEFGHJKLMNPQRSTUV", // odd numbered zones
+            "FGHJKLMNPQRSTUVABCDE"  // even numbered zones
+            ];     
+            
+            var x = Math.floor(e / 100000);
+            var y = Math.floor(n / 100000);
+            var z = zone - 1;
+
+            if (bSouth) {
+                y -= 100;
+            }
+            
+            if ((x >= 1) && (x <= 8)) {                           
+                r  = UTMEast[z % 3].charAt(x - 1);
+            }
+            else {
+                r = '-';
+            }
+
+            if (y >= 0) {
+                r += UTMNorthGroup1[z % 2].charAt(y % 20);// Northern Hemisphere
+            }
+            else {
+                r += UTMNorthGroup1[z  % 2].charAt(19+((y+1) % 20));// Southern Hemisphere      
+            }
+            return r;            
+        }
+        
         L.setOptions(this, options);
     }
     
