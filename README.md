@@ -11,7 +11,7 @@ This is a grid for map projections with constant scale such as UTM, British Grid
 
 The grid can have its left/west axis and south/bottom axis labeled with values corresponding to the grid line position within a 100km square. Most grids repeat their numbering every 100km. These labels can optionally included subscripted hundreds of km.
 
-The grid can also label every square in its bottom left corner. This label may be preceeded with a 100km square identifier defined for the grid - 2 letters for the British Grid.
+The grid can also label every square in its bottom left corner. This label may be preceeded with a 100km square identifier defined for the grid - 2 letters for the British Grid. For the predefined UTM grid on the WGS84 datum, MGRS 100km letter pairs can be used.
 
 Such a grid normally has a rectangular bound but this code allows a grid to be 'clipped' so that a grid may hidden where it would overlap another grid. The example uses clipped Irish (EPSG code 29903) and British (EPSG code 27700) grids - zoom the example out between Ireland and the British mainland to see the clipping in action.
 
