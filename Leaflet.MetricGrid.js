@@ -677,7 +677,7 @@ L.MetricGrid = L.Layer.extend({
                         // check on screen and within grid bounds
                         if ((s.x > 0) && (s.y < hh) && (x < this.options.bounds[1][0]) && (y < this.options.bounds[1][1])) {
                             var nStr = this._format_northings(x, d);
-                            var eStr = this._format_northings(y, d);
+                            var eStr = this._format_eastings(y, d);
                             var sq = this.options.hundredKmSquareFunc(x, y);
                             str = sq;
                             if (d < 100000) {
