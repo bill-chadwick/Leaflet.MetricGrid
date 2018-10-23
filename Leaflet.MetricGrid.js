@@ -19,7 +19,7 @@ L.MetricGrid = L.Layer.extend({
 
         proj4ProjDef: "must be provided",                    // must be provided
         bounds: [[0, 0] , [0, 0]],                           // must be provided. First coord is bottom left, second is top right in [x,y] format
-        clip: null,                                          // optional
+        clip: null,                                          // optional, clip polygon in grid coordinates
         drawClip: false,                                     // optional, when true, the clip bounds are drawn with the same pen as the grid
         hundredKmSquareFunc: function(e, n) {return "";},    // optional, params are eastings and northings in metres
 
@@ -31,7 +31,7 @@ L.MetricGrid = L.Layer.extend({
         color: "#00f",
         font: "bold 16px Verdana",
         minInterval: 100,                   // minimum grid interval in metres
-        maxInterval: 100000,                // maximum grid interval in metres
+        maxInterval: 100000,                // maximum grid interval in metres, the bounds values must be multiples of this
         minZoom: 4                          // minimum zoom at which grid is drawn
     },
 
