@@ -31,7 +31,7 @@ L.MetricGrid = L.Layer.extend({
         color: "#00f",
         font: "bold 16px Verdana",
         minInterval: 100,                   // minimum grid interval in metres
-        maxInterval: 100000,                // maximum grid interval in metres, the bounds values must be multiples of this
+        maxInterval: 100000,                // maximum grid interval in metres, the bounds values should be multiples of this
         minZoom: 4                          // minimum zoom at which grid is drawn
     },
 
@@ -525,25 +525,25 @@ L.MetricGrid = L.Layer.extend({
             // Limit to grid bounds. We don't need to draw anything
             // if the map is way outside the area of the grid.
             if (grdWx < this.options.bounds[0][0]) {
-                grdWx = this.options.bounds[0][0];
+                grdWx = Math.floor(this.options.bounds[0][0] / spacing) * spacing;
             }
             if (grdWx > this.options.bounds[1][0]) {
                 return; // left of grid > east limit
             }
             if (grdEx > this.options.bounds[1][0]) {
-                grdEx = this.options.bounds[1][0];
+                grdEx = Math.ceil(this.options.bounds[1][0] / spacing) * spacing;
             }
             if (grdEx < this.options.bounds[0][0]) {
                 return; // right of grid < west limit
             }
             if (grdSy < this.options.bounds[0][1]) {
-                grdSy = this.options.bounds[0][1];
+                grdSy = Math.floor(this.options.bounds[0][1] / spacing) * spacing;
             }
             if (grdSy > this.options.bounds[1][1]) {
                 return; // south of grid > north limit
             }
             if (grdNy > this.options.bounds[1][1]) {
-                grdNy = this.options.bounds[1][1];
+                grdNy = Math.ceil(this.options.bounds[1][1] / spacing) * spacing;
             }
             if (grdNy < this.options.bounds[0][1]) {
                 return; // north of grid < south limit
