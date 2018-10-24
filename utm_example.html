@@ -31,28 +31,32 @@
     });
    
     var u30Grid = L.utmGrid(30, false, {
-        color: '#C00',
+        color: '#800',
+        latLonClipBounds: [[0, -180 + (29 * 6)],[80, -180 + (29 * 6) + 6]],
+        drawClip: false, 
         showAxisLabels: [100, 1000, 10000, 100000],
         showSquareLabels: [100000], // label 100km grid squares
         showAxis100km: true
     });
    
     var u31Grid = L.utmGrid(31, false, {
-        color: '#0C0',
+        color: '#080',
+        latLonClipBounds: [[0, -180 + (30 * 6)],[80, -180 + (30 * 6) + 6]],
+        drawClip: false,         
         showAxisLabels: [100, 1000, 10000, 100000],
         showSquareLabels: [100000], // label 100km grid squares
         showAxis100km: true
     });
 
     var u30sGrid = L.utmGrid(30, true, {
-        color: '#00C',
+        color: '#008',
         showAxisLabels: [100, 1000, 10000, 100000],
         showSquareLabels: [100000], // label 100km grid squares
         showAxis100km: true
     });
     
     var mymap = L.map('mapid', {
-        center: [52, -1],
+        center: [52, 0],
         zoom: 14,
         layers: [osmLayer, u30Grid, u31Grid, u30sGrid]
     });

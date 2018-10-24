@@ -20,6 +20,7 @@ L.MetricGrid = L.Layer.extend({
         proj4ProjDef: "must be provided",                    // must be provided
         bounds: [[0, 0] , [0, 0]],                           // must be provided. First coord is bottom left, second is top right in [x,y] format
         clip: null,                                          // optional, clip polygon in grid coordinates
+        latLonClipBounds: null,                              // optional, Leaflet.LatLngBounds or equivalent array
         drawClip: false,                                     // optional, when true, the clip bounds are drawn with the same pen as the grid
         hundredKmSquareFunc: function(e, n) {return "";},    // optional, params are eastings and northings in metres
 
@@ -192,12 +193,38 @@ L.MetricGrid = L.Layer.extend({
             // finish the path and set the clip region
             if (this.options.drawClip) {
                 ctx.stroke();                
-                }
+            }
             ctx.clip();   
 
 
             
         }
+    },
+    
+    // sets a rectangular lat/lon clip
+    // the latLonClipBounds should be [[bottom lat, left lon],[top lat, right lon]]
+    // return is clip bounds in canvas coords
+    _setLLClipBounds: function (ctx, map) {
+      
+        var b = L.latLngBounds(this.options.latLonClipBounds);
+        var bl = map.latLngToContainerPoint(b.getSouthWest());
+        var tr = map.latLngToContainerPoint(b.getNorthEast());
+        
+        ctx.beginPath();
+        ctx.moveTo(bl.x, bl.y);
+        ctx.lineTo(tr.x, bl.y);
+        ctx.lineTo(tr.x, tr.y);
+        ctx.lineTo(bl.x, tr.y);
+        ctx.lineTo(bl.x, bl.y);
+        
+        // finish the path and set the clip region
+        if (this.options.drawClip) {
+            ctx.stroke();                
+        }
+        ctx.clip();        
+        
+        // LL bounds in canvas coords, for use when labelling
+        return L.bounds(bl, tr); 
     },
 
 
@@ -508,6 +535,7 @@ L.MetricGrid = L.Layer.extend({
             grdEx = Math.ceil(grdEx / spacing) * spacing;
             grdNy = Math.ceil(grdNy / spacing) * spacing;
 
+            var canvasClipBounds = null;
             if (this.options.clip) {
                 // if any of the corners of our grid are outside the clip path then we need to clip
                 // must do this before restricting to grid bounds
@@ -520,6 +548,9 @@ L.MetricGrid = L.Layer.extend({
                 if ((!swInClip) || (!seInClip) || (!neInClip) || (!nwInClip)){
                     this._setClip(ctx);
                 }
+            }
+            else if (this.options.latLonClipBounds) {     
+                canvasClipBounds = this._setLLClipBounds(ctx, map);
             }
 
             // Limit to grid bounds. We don't need to draw anything
@@ -613,11 +644,17 @@ L.MetricGrid = L.Layer.extend({
                         // check on screen and within grid bounds
                         if ((s.x > 0) && (s.y < hh) && (x < this.options.bounds[1][0])) {
                             
-                            if(this.options.clip) {
+                            if (this.options.clip) {
                                 if (!this._inside([x, y+d2], this.options.clip)) {
                                     continue;
                                 }
                             }
+                            else if (this.options.latLonClipBounds) {
+                                if (!canvasClipBounds.contains([s.x, s.y])) {
+                                    continue;
+                                }
+                            }
+                            
                             var eStr = this._format_eastings(x, d);
                             txtWidth = ctx.measureText(eStr).width;
                             
@@ -644,8 +681,13 @@ L.MetricGrid = L.Layer.extend({
                         // check on screen and within grid bounds
                         if ((s.x > 0) && (s.y < hh) && (y < this.options.bounds[1][1])) {
                             
-                            if(this.options.clip) {
+                            if (this.options.clip) {
                                 if (!this._inside([x+d2, y], this.options.clip)) {
+                                    continue;
+                                }
+                            }
+                            else if (this.options.latLonClipBounds) {
+                                if (!canvasClipBounds.contains([s.x, s.y])) {
                                     continue;
                                 }
                             }
