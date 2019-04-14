@@ -1,11 +1,11 @@
 # Leaflet.MetricGrid
 A general purpose Metric Grid overlay for Leaflet with ready defined British, Irish Grids and WGS84 UTM grids.
 
-British and Irish Example http://htmlpreview.github.com/?https://github.com/bill-chadwick/Leaflet.MetricGrid/blob/master/example.html
+British and Irish Example http://www.bdcc.co.uk/leaflet/example.html
 
-Swiss Example http://htmlpreview.github.com/?https://github.com/bill-chadwick/Leaflet.MetricGrid/blob/master/swiss_example.html
+Swiss Example http://www.bdcc.co.uk/leaflet/swiss_example.html
 
-UTM Example http://htmlpreview.github.com/?https://github.com/bill-chadwick/Leaflet.MetricGrid/blob/master/utm_example.html including northern and southern hemisphere grids.
+UTM Example http://www.bdcc.co.uk/leaflet/utm_example.html including northern and southern hemisphere grids.
 
 This is a grid for map projections with constant scale such as UTM, British Grid, Irish Grid etc. On the ground, grid squares are square with sides of 100m, 1km, 10km or 100km (other intervals would be possible but are unusual). 
 
